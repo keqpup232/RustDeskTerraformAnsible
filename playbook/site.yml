@@ -1,0 +1,84 @@
+- name: Install Aspia
+  hosts: rustdesk
+  become: yes
+  become_user: root
+  remote_user: centos
+
+  tasks:
+
+    - name: wget unzip install
+      ansible.builtin.yum:
+        name:
+          - wget
+          - unzip
+
+    - name: Get vector distrib
+      ansible.builtin.get_url:
+        url: "https://nodejs.org/dist/v16.15.1/node-v16.15.1-linux-x64.tar.xz"
+        dest: "/opt/node-v16.15.1-linux-x64.tar.xz"
+
+    - name: Create directory for Vector
+      file:
+        state: directory
+        path: "/opt/node-v16.15.1"
+
+    - name: Extract vector in directory
+      ansible.builtin.unarchive:
+        src: "/opt/node-v16.15.1-linux-x64.tar.xz"
+        dest: "/opt/node-v16.15.1"
+        extra_opts: [ --strip-components=1 ]
+        remote_src: yes
+
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: "/opt/node-v16.15.1/bin/node"
+        dest: "/usr/bin/node"
+        owner: root
+        group: root
+        state: link
+
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: "/opt/node-v16.15.1/bin/npm"
+        dest: "/usr/bin/npm"
+        owner: root
+        group: root
+        state: link
+
+    - name: Create basic config router
+      ansible.builtin.command: "npm install pm2 -g"
+
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: "/opt/node-v16.15.1/bin/pm2"
+        dest: "/usr/bin/pm2"
+        owner: root
+        group: root
+        state: link
+
+    - name: Get vector distrib
+      ansible.builtin.get_url:
+        url: "https://github.com/rustdesk/rustdesk-server/releases/download/1.1.5/rustdesk-server-linux-x64.zip"
+        dest: "/opt/rustdesk-server-linux-x64.zip"
+
+    - name: Create directory for Vector
+      file:
+        state: directory
+        path: "/opt/rustdesk"
+
+    - name: Extract vector in directory
+      ansible.builtin.unarchive:
+        src: "/opt/rustdesk-server-linux-x64.zip"
+        dest: "/opt/rustdesk"
+        remote_src: yes
+
+    - name: Create basic config router
+      ansible.builtin.command: "cd /opt/rustdesk & sudo pm2 start hbbs & sudo pm2 start hbbr"
+
+    - name: Create basic config router
+      ansible.builtin.command: "pm2 list"
+      register: result
+
+    - name: Print the gateway for each host when defined
+      ansible.builtin.debug:
+        msg: System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}
