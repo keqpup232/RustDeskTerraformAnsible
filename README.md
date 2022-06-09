@@ -1,3 +1,4 @@
+```bash
 sudo yum install wget unzip -y
 wget https://nodejs.org/dist/v16.15.1/node-v16.15.1-linux-x64.tar.xz
 tar -xf node-v16.15.1-linux-x64.tar.xz
@@ -19,4 +20,4 @@ http://web.rustdesk.com/
 
 cat public key and external ip
 rustdesk-host=51.250.95.77,key=VAwzU96EoCLUSEbB+nrhiU5XbElLNPWeLnCdge2hT6g=.exe
-
+```
